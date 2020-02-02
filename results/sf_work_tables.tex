@@ -1,0 +1,216 @@
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, MNL, \textsc{Agreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2,d_{+},b,w\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2,d_{+}\}}$\\
+$d_2$ & &  & $\bm{\{d_1,b\}}$ & $\bm{\{d_1,d_{+},b,w\}}$ & $\bm{\{d_1,d_{+},t,w\}}$ & $\bm{\{d_1,d_{+},t,b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_1,d_2,b,w\}}$ & $\bm{\{d_1,d_2,t,w\}}$ & $\bm{\{d_2,t,b\}}$\\
+$t$ & &  &  &  & $\bm{\{\}}$ & $\bm{\{d_{+},b\}}$\\
+$b$ & &  &  &  &  & $\{\}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, MNL, \textsc{Agreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2,d_{+},b,w\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2,d_{+}\}}$\\
+$d_2$ & &  & $\bm{\{d_1,b\}}$ & $\bm{\{d_1,d_{+},b,w\}}$ & $\bm{\{d_1,d_{+},t,w\}}$ & $\bm{\{d_1,d_{+},t,b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_1,d_2,b,w\}}$ & $\bm{\{d_1,d_2,t,w\}}$ & $\bm{\{d_2,t,b\}}$\\
+$t$ & &  &  &  & $\bm{\{\}}$ & $\bm{\{d_{+},b\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_2,t\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, MNL, \textsc{Disagreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b,w\}}$ & $\bm{\{t,b,w\}}$ & $\bm{\{b\}}$ & $\bm{\{t,w\}}$ & $\bm{\{t,b\}}$\\
+$d_2$ & &  & $\bm{\{t\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_2\}}$ & $\bm{\{\}}$ & $\bm{\{d_2\}}$\\
+$t$ & &  &  &  & $\bm{\{d_2,d_{+}\}}$ & $\bm{\{d_1\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_2\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, MNL, \textsc{Disagreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b,w\}}$ & $\bm{\{t,b,w\}}$ & $\bm{\{b\}}$ & $\bm{\{t,w\}}$ & $\bm{\{t,b\}}$\\
+$d_2$ & &  & $\bm{\{t\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_2\}}$ & $\bm{\{\}}$ & $\bm{\{d_2\}}$\\
+$t$ & &  &  &  & $\bm{\{d_2,d_{+}\}}$ & $\bm{\{d_1\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_2\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, CDM, \textsc{Agreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\{d_{+},w\}$ & $\bm{\{d_2,b\}}$ & $\bm{\{d_{+}\}}$ & $\bm{\{d_2,d_{+}\}}$ & $\bm{\{d_2,d_{+}\}}$\\
+$d_2$ & &  & $\{\}$ & $\bm{\{d_1,b,w\}}$ & $\bm{\{d_1,d_{+}\}}$ & $\bm{\{d_1,t,b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{\}}$ & $\bm{\{d_1,d_2\}}$ & $\bm{\{d_1,d_2,t\}}$\\
+$t$ & &  &  &  & $\bm{\{\}}$ & $\bm{\{d_1,d_2,b\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_1,d_{+}\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, CDM, \textsc{Agreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{d_{+},b\}}$ & $\bm{\{d_2,b\}}$ & $\bm{\{d_{+}\}}$ & $\bm{\{d_2,d_{+}\}}$ & $\bm{\{d_2,d_{+}\}}$\\
+$d_2$ & &  & $\bm{\{d_1,t,b,w\}}$ & $\bm{\{d_1,b,w\}}$ & $\bm{\{d_1,d_{+}\}}$ & $\bm{\{d_1,t,b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{\}}$ & $\bm{\{d_1,d_2\}}$ & $\bm{\{d_1,d_2,t\}}$\\
+$t$ & &  &  &  & $\bm{\{\}}$ & $\bm{\{d_1,d_2,b\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_1,d_{+}\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, CDM, \textsc{Disagreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b,w\}}$ & $\bm{\{w\}}$ & $\bm{\{d_2,b,w\}}$ & $\bm{\{d_2,t,w\}}$ & $\bm{\{d_2,t,b\}}$\\
+$d_2$ & &  & $\bm{\{w\}}$ & $\bm{\{d_{+},b\}}$ & $\bm{\{t,w\}}$ & $\bm{\{d_{+},b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{w\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$\\
+$t$ & &  &  &  & $\{d_{+}\}$ & $\bm{\{\}}$\\
+$b$ & &  &  &  &  & $\bm{\{t\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, CDM, \textsc{Disagreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b,w\}}$ & $\bm{\{w\}}$ & $\bm{\{d_2,b,w\}}$ & $\bm{\{d_2,t,w\}}$ & $\bm{\{d_2,t,b\}}$\\
+$d_2$ & &  & $\bm{\{w\}}$ & $\bm{\{d_{+},b\}}$ & $\bm{\{t,w\}}$ & $\bm{\{d_{+},b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{w\}}$ & $\bm{\{\}}$ & $\bm{\{\}}$\\
+$t$ & &  &  &  & $\bm{\{d_1,d_2,w\}}$ & $\bm{\{\}}$\\
+$b$ & &  &  &  &  & $\bm{\{t\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, NL, \textsc{Agreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{d_{+}\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2\}}$ & $\bm{\{w\}}$ & $\bm{\{b\}}$\\
+$d_2$ & &  & $\bm{\{d_1,t\}}$ & $\bm{\{d_1,d_{+},b\}}$ & $\bm{\{d_1,d_{+},w\}}$ & $\bm{\{d_1,d_{+},b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_1,d_2,b\}}$ & $\bm{\{d_1,d_2,t,w\}}$ & $\bm{\{d_1,d_2,t,b\}}$\\
+$t$ & &  &  &  & $\bm{\{w\}}$ & $\bm{\{b\}}$\\
+$b$ & &  &  &  &  & $\bm{\{\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, NL, \textsc{Agreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{d_{+}\}}$ & $\bm{\{d_2\}}$ & $\bm{\{d_2\}}$ & $\bm{\{w\}}$ & $\bm{\{b\}}$\\
+$d_2$ & &  & $\bm{\{d_1,t\}}$ & $\bm{\{d_1,d_{+},b\}}$ & $\bm{\{d_1,d_{+},w\}}$ & $\bm{\{d_1,d_{+},b\}}$\\
+$d_{+}$ & &  &  & $\bm{\{d_1,d_2,b\}}$ & $\bm{\{d_1,d_2,t,w\}}$ & $\bm{\{d_1,d_2,t,b\}}$\\
+$t$ & &  &  &  & $\bm{\{w\}}$ & $\bm{\{b\}}$\\
+$b$ & &  &  &  &  & $\bm{\{\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, NL, \textsc{Disagreement}, greedy}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b\}}$ & $\bm{\{t,b\}}$ & $\bm{\{b\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$d_2$ & &  & $\bm{\{t,b\}}$ & $\bm{\{\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$d_{+}$ & &  &  & $\bm{\{\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$t$ & &  &  &  & $\bm{\{d_2\}}$ & $\bm{\{d_2\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_1\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{\textsc{SFWork}, NL, \textsc{Disagreement}, approx}
+ \scalebox{0.6}{
+\begin{tabular}{ccccccc}
+\toprule
+&$d_1$ & $d_2$ & $d_{+}$ & $t$ & $b$ & $w$\\
+\midrule
+$d_1$ & & $\bm{\{t,b\}}$ & $\bm{\{t,b\}}$ & $\bm{\{b\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$d_2$ & &  & $\bm{\{t,b\}}$ & $\bm{\{\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$d_{+}$ & &  &  & $\bm{\{\}}$ & $\bm{\{t\}}$ & $\bm{\{t\}}$\\
+$t$ & &  &  &  & $\bm{\{d_2\}}$ & $\bm{\{d_2\}}$\\
+$b$ & &  &  &  &  & $\bm{\{d_1\}}$\\
+$w$ & &  &  &  &  & \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
