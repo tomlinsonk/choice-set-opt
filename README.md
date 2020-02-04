@@ -1,6 +1,6 @@
 # Choice Set Optimization
 This repository accompanies the paper:
-> Kiran Tomlinson and Austin R. Benson. Choice Set Optimization Under Discrete Choice Models of Group Decisions.
+> Kiran Tomlinson and Austin R. Benson. Choice Set Optimization Under Discrete Choice Models of Group Decisions. [arXiv:2002.00421](https://arxiv.org/abs/2002.00421), 2020.
 
 ### Libraries 
 We used:
