@@ -366,6 +366,10 @@ def run_sf_work_experiments(args):
             approx_error = 0
             greedy_error = 0
 
+            # Integer programming method, only for MNL
+            ip_error = 0
+            ip_is_opt = 0
+
             for x, y in itertools.combinations(range(num_alts), 2):
                 model.set_C([x, y])
 
@@ -380,6 +384,13 @@ def run_sf_work_experiments(args):
                 optimize_choice_sets.approx_agreement(model, 0.01, maximize=maximize)
                 approx_Z = model.dcs.Z
                 approx_D = model.disagreement()
+
+                if model.short_name == 'mnl':
+                    optimize_choice_sets.mnl_integer_program_agreement(model, maximize=maximize)
+                    if set(opt_Z) == set(model.dcs.Z):
+                        ip_is_opt += 1
+                    ip_D = model.disagreement()
+                    ip_error += abs(ip_D - opt_D)
 
                 greedy_Zs[x][y] = greedy_Z
                 opt_Zs[x][y] = opt_Z
@@ -398,6 +409,8 @@ def run_sf_work_experiments(args):
             print('SFWork', model.short_name.upper(), 'Disagreement' if maximize else 'Agreement')
             print(f'\tGreedy is opt: {greedy_is_opt}/{num_choice_sets} (error: {greedy_error:.3f})\n'
                   f'\tApprox is opt: {approx_is_opt}/{num_choice_sets} (error: {approx_error:.3f})')
+            if model.short_name == 'mnl':
+                print(f'\tIP is opt: {ip_is_opt}/{num_choice_sets} (error: {ip_error:.3f})')
 
             greedy_tabular_string = sets_to_tabular(greedy_Zs, opt_Zs, all_item_labels)
             approx_tabular_string = sets_to_tabular(approx_Zs, opt_Zs, all_item_labels)
@@ -476,8 +489,20 @@ def agreement_helper(choice_set, model, epsilon):
     approx_min_Z, approx_min_D, approx_max_Z, approx_max_D, num_sets_computed = optimize_choice_sets.approx_agreement(
         model, epsilon=epsilon)
 
-    return choice_set, greedy_min_D, approx_min_D, greedy_min_Z, approx_min_Z, \
-           greedy_max_D, approx_max_D, greedy_max_Z, approx_max_Z, num_sets_computed, 2 ** len(model.dcs.not_C)
+    # Integer programming approach: only run for MNL
+    ip_min_D = ip_min_Z = ip_max_D = ip_max_Z = None
+    if model.short_name == 'mnl':
+        optimize_choice_sets.mnl_integer_program_agreement(model, maximize=False)
+        ip_min_D = model.disagreement()
+        ip_min_Z = model.dcs.Z
+
+        optimize_choice_sets.mnl_integer_program_agreement(model, maximize=True)
+        ip_max_D = model.disagreement()
+        ip_max_Z = model.dcs.Z
+
+    return choice_set, greedy_min_D, approx_min_D, ip_min_D, greedy_min_Z, approx_min_Z, ip_min_Z, \
+           greedy_max_D, approx_max_D, ip_max_D, greedy_max_Z, approx_max_Z, ip_max_Z, num_sets_computed, \
+           2 ** len(model.dcs.not_C)
 
 
 def allstate_all_pairs_promo(num_threads, cdm, unique_items, item_indices, epsilon, brute_force=False):

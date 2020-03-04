@@ -2,6 +2,7 @@ import time
 from itertools import chain, combinations
 
 import numpy as np
+import gurobipy as gp
 
 from choice_models import DiscreteChoiceSetting, MNL, CDM, NL
 
@@ -268,6 +269,110 @@ def nl_approx_agreement(nl, epsilon=0.01, maximize=False):
     return process_L(nl, L, maximize)
 
 
+def mnl_integer_program_agreement(mnl, maximize=False):
+    mnl.set_Z([])
+
+    k = len(mnl.dcs.C)
+    m = len(mnl.dcs.not_C)
+    n = len(mnl.dcs.A)
+
+    e_C = [sum(np.exp(mnl.u[a, y]) for y in mnl.dcs.C) for a in range(n)]
+    e = np.exp(mnl.u)
+
+    model = gp.Model()
+    model.setParam('LogToConsole', False)
+    delta = model.addVars(k, n, n, name='delta')
+    z = model.addVars(n, name='z')
+    x = model.addVars(m, vtype=gp.GRB.BINARY, name='x')
+
+    if maximize:
+        g = model.addVars(k, n, n, vtype=gp.GRB.BINARY, name='g')
+        model.addConstrs(2 * g[y, a, b] + z[a] * e[a, mnl.dcs.C[y]] - z[b] * e[b, mnl.dcs.C[y]] >= delta[y, a, b]
+                         for y in range(k) for a in range(n) for b in range(a + 1, n))
+        model.addConstrs(2 * (1 - g[y, a, b]) + z[b] * e[b, mnl.dcs.C[y]] - z[a] * e[a, mnl.dcs.C[y]] >= delta[y, a, b]
+                         for y in range(k) for a in range(n) for b in range(a + 1, n))
+
+    model.addConstrs(z[a] * e[a, mnl.dcs.C[y]] - z[b] * e[b, mnl.dcs.C[y]] <= delta[y, a, b]
+                     for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.addConstrs(z[b] * e[b, mnl.dcs.C[y]] - z[a] * e[a, mnl.dcs.C[y]] <= delta[y, a, b]
+                     for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.addConstrs(z[a] * e_C[a] + z[a] * gp.quicksum(x[i] * e[a, mnl.dcs.not_C[i]] for i in range(m)) == 1
+                     for a in range(n))
+
+    obj = gp.quicksum(delta[y, a, b] for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.setObjective(obj, gp.GRB.MAXIMIZE if maximize else gp.GRB.MINIMIZE)
+    model.optimize()
+
+    # for v in model.getVars():
+    #     print('%s %g' % (v.varName, v.x))
+
+    # print('Obj: %g' % obj.getValue())
+
+    for i in range(m):
+        if x[i].x > 0.5:
+            mnl.update_Z(mnl.dcs.not_C[i])
+
+
+# Doesn't work for CDM
+# def cdm_integer_program_agreement(cdm, maximize=False):
+#     cdm.set_Z([])
+#
+#     k = len(cdm.dcs.C)
+#     m = len(cdm.dcs.not_C)
+#     n = len(cdm.dcs.A)
+#
+#     # Effective (exp-)utilities based on pulls from C
+#     u = cdm.u_p[:, cdm.dcs.C].sum(axis=1)
+#     e = np.exp(u)
+#
+#     # Effective exp-utilities of all items in C based on pulls from C
+#     e_C = e[:, cdm.dcs.C].sum(axis=1)
+#
+#     model = gp.Model()
+#     # model.setParam('LogToConsole', False)
+#     model.setParam('NonConvex', 2)
+#     delta = model.addVars(k, n, n, name='delta')
+#     z = model.addVars(n, name='z')
+#     x = model.addVars(m, vtype=gp.GRB.BINARY, name='x')
+#     v = model.addVars(k + m, n, name='v')
+#     w = model.addVars(k + m, n, name='w')
+#     t = model.addVars(k + m, n, name='t')
+#
+#     if maximize:
+#         g = model.addVars(k, n, n, vtype=gp.GRB.BINARY, name='g')
+#         model.addConstrs(2 * g[y, a, b] + z[a] * w[cdm.dcs.C[y], a] - z[b] * w[cdm.dcs.C[y], b] <= delta[y, a, b]
+#                          for y in range(k) for a in range(n) for b in range(a + 1, n))
+#         model.addConstrs(2 * (1 - g[y, a, b]) + z[b] * w[cdm.dcs.C[y], b] - z[a] * w[cdm.dcs.C[y], a] <= delta[y, a, b]
+#                          for y in range(k) for a in range(n) for b in range(a + 1, n))
+#
+#     model.addConstrs(z[a] * w[cdm.dcs.C[y], a] - z[b] * w[cdm.dcs.C[y], b] <= delta[y, a, b]
+#                      for y in range(k) for a in range(n) for b in range(a+1, n))
+#     model.addConstrs(z[b] * w[cdm.dcs.C[y], b] - z[a] * w[cdm.dcs.C[y], a] <= delta[y, a, b]
+#                      for y in range(k) for a in range(n) for b in range(a+1, n))
+#     model.addConstrs(z[a] * e_C[a] + z[a] * gp.quicksum(t[cdm.dcs.not_C[i], a] for i in range(m)) == 1
+#                      for a in range(n))
+#     model.addConstrs(u[a, i] + gp.quicksum(x[j] * cdm.u_p[a, cdm.dcs.not_C[j], i] for j in range(m)) == v[i, a]
+#                      for i in range(k + m) for a in range(n))
+#     for i in range(k + m):
+#         for a in range(n):
+#             model.addGenConstrExp(v[i, a], w[i, a])
+#     model.addConstrs(x[i] * w[cdm.dcs.not_C[i], a] == t[cdm.dcs.not_C[i], a]
+#                      for i in range(m) for a in range(n))
+#
+#     obj = gp.quicksum(delta[y, a, b] for y in range(k) for a in range(n) for b in range(a+1, n))
+#     model.setObjective(obj, gp.GRB.MAXIMIZE if maximize else gp.GRB.MINIMIZE)
+#     model.optimize()
+#
+#     # for v in model.getVars():
+#     #     print('%s %g' % (v.varName, v.x))
+#
+#     print('Obj: %g' % obj.getValue())
+#
+#     for i in range(m):
+#         if x[i].x > 0.5:
+#             cdm.update_Z(cdm.dcs.not_C[i])
+
+
 def greedy_promotion_step(model, target):
     """
     A single step in the greedy algorithm for promotion. Find the single item whose inclusion increases the number of
@@ -402,6 +507,22 @@ def cdm_approx_promotion(cdm, target, epsilon=0.01):
 
 if __name__ == '__main__':
     # Example usage
+    cdm = CDM.random_instance(2, 2, 41)
+    mnl = MNL.random_instance(2, 2, 41)
+
+    mnl_integer_program_agreement(mnl, maximize=True)
+    print('Disagreement:', mnl.disagreement())
+    mnl_integer_program_agreement(mnl)
+    print('Disagreement:', mnl.disagreement())
+
+    # cdm_integer_program_agreement(cdm, maximize=True)
+    # print('Disagreement:', cdm.disagreement())
+    # cdm_integer_program_agreement(cdm)
+    # print('Disagreement:', cdm.disagreement())
+
+    exit()
+
+    # Example usage
     dcs = DiscreteChoiceSetting(
         list(range(2)),
         list(range(4)),
@@ -415,6 +536,8 @@ if __name__ == '__main__':
 
     mnl = MNL(dcs, u)
 
+    mnl_integer_program_agreement(mnl, maximize=True)
+
     print('Items:', dcs.U)
     print('Agents:', dcs.A)
     print('Choice set:', dcs.C)
@@ -423,21 +546,21 @@ if __name__ == '__main__':
     print('Initial disagreement:', mnl.disagreement())
 
     start = time.time()
-    greedy_agreement(mnl)
+    greedy_agreement(mnl, maximize=True)
     print('Greedy')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
     print('\tRuntime:', time.time() - start)
 
     start = time.time()
-    mnl_approx_agreement(mnl, 0.1)
+    mnl_approx_agreement(mnl, 0.1, maximize=True)
     print('Approximation alg')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
     print('\tRuntime:', time.time() - start)
 
     start = time.time()
-    opt_agreement(mnl)
+    opt_agreement(mnl, maximize=True)
     print('Brute force')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
