@@ -11,6 +11,8 @@ We used:
 - Matplotlib 3.1.1
 - tqdm 4.35.0
 - python-dateutil 2.8.0
+- gurobipy 9.0.1 
+- Gurobi 9.0.1 
 
 ### Files
 - ``choice_models.py``: implementations of MNL, CDM, and NL models
@@ -70,7 +72,10 @@ Intel Core i7-6700T CPU running Ubuntu 18.04.3 LTS). Since PyTorch uses numerica
 different models will inferred on different computer architectures or PyTorch/Python versions; however, this should have
 no effect on the trends we observe.
 
-Running ``python3 optimize_choice_sets.py`` will show details about the bad instance of Agreement for Greedy from Appendix D.1.
+If you don't have access to a Gurobi license (free for academic use), you can check out commit b03f43e3c33abab96522d010b7f706f88babb234
+to run the old version of the code, which has everything except the MIBLP code.
+
+Running ``python3 optimize_choice_sets.py`` will show details about the bad instance of Agreement for Greedy from the appendix.
 
 
 

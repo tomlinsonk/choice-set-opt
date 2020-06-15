@@ -230,7 +230,6 @@ def plot_all_pairs_agree():
             axes[row, col].set_yscale('symlog', linthreshy=0.0011)
             ip_axes[row].set_yscale('symlog', linthreshy=0.0011)
 
-
     plt.figure(fig.number)
     plt.tight_layout(h_pad=0, w_pad=0.3)
     plt.savefig('plots/all_pairs_agree.pdf', bbox_inches='tight')
@@ -238,7 +237,10 @@ def plot_all_pairs_agree():
     plt.close()
 
     plt.figure(ip_fig.number)
-    ip_axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
+    ip_axes[0].set_yticks([-2e-8, -1e-8, 0, 1e-8])
+    ip_axes[1].set_yticks([0, 5e-5, 10e-5, 15e-5, 20e-5])
+    ip_axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
+    ip_axes[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
     plt.tight_layout(h_pad=0, w_pad=0.3)
     plt.savefig('plots/ip_all_pairs_agree.pdf', bbox_inches='tight')
     print('Saved plot to: plots/ip_all_pairs_agree.pdf')
