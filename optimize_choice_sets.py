@@ -2,6 +2,7 @@ import time
 from itertools import chain, combinations
 
 import numpy as np
+import gurobipy as gp
 
 from choice_models import DiscreteChoiceSetting, MNL, CDM, NL
 
@@ -268,6 +269,45 @@ def nl_approx_agreement(nl, epsilon=0.01, maximize=False):
     return process_L(nl, L, maximize)
 
 
+def mnl_integer_program_agreement(mnl, maximize=False):
+    mnl.set_Z([])
+
+    k = len(mnl.dcs.C)
+    m = len(mnl.dcs.not_C)
+    n = len(mnl.dcs.A)
+
+    e_C = [sum(np.exp(mnl.u[a, y]) for y in mnl.dcs.C) for a in range(n)]
+    e = np.exp(mnl.u)
+
+    model = gp.Model()
+    model.setParam('LogToConsole', False)
+    delta = model.addVars(k, n, n, name='delta')
+    z = model.addVars(n, name='z')
+    x = model.addVars(m, vtype=gp.GRB.BINARY, name='x')
+
+    if maximize:
+        g = model.addVars(k, n, n, vtype=gp.GRB.BINARY, name='g')
+        model.addConstrs(2 * g[y, a, b] + z[a] * e[a, mnl.dcs.C[y]] - z[b] * e[b, mnl.dcs.C[y]] >= delta[y, a, b]
+                         for y in range(k) for a in range(n) for b in range(a + 1, n))
+        model.addConstrs(2 * (1 - g[y, a, b]) + z[b] * e[b, mnl.dcs.C[y]] - z[a] * e[a, mnl.dcs.C[y]] >= delta[y, a, b]
+                         for y in range(k) for a in range(n) for b in range(a + 1, n))
+
+    model.addConstrs(z[a] * e[a, mnl.dcs.C[y]] - z[b] * e[b, mnl.dcs.C[y]] <= delta[y, a, b]
+                     for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.addConstrs(z[b] * e[b, mnl.dcs.C[y]] - z[a] * e[a, mnl.dcs.C[y]] <= delta[y, a, b]
+                     for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.addConstrs(z[a] * e_C[a] + z[a] * gp.quicksum(x[i] * e[a, mnl.dcs.not_C[i]] for i in range(m)) == 1
+                     for a in range(n))
+
+    obj = gp.quicksum(delta[y, a, b] for y in range(k) for a in range(n) for b in range(a+1, n))
+    model.setObjective(obj, gp.GRB.MAXIMIZE if maximize else gp.GRB.MINIMIZE)
+    model.optimize()
+
+    for i in range(m):
+        if x[i].x > 0.5:
+            mnl.update_Z(mnl.dcs.not_C[i])
+
+
 def greedy_promotion_step(model, target):
     """
     A single step in the greedy algorithm for promotion. Find the single item whose inclusion increases the number of
@@ -423,22 +463,29 @@ if __name__ == '__main__':
     print('Initial disagreement:', mnl.disagreement())
 
     start = time.time()
-    greedy_agreement(mnl)
+    greedy_agreement(mnl, maximize=False)
     print('Greedy')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
     print('\tRuntime:', time.time() - start)
 
     start = time.time()
-    mnl_approx_agreement(mnl, 0.1)
+    mnl_approx_agreement(mnl, 0.1, maximize=False)
     print('Approximation alg')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
     print('\tRuntime:', time.time() - start)
 
     start = time.time()
-    opt_agreement(mnl)
+    opt_agreement(mnl, maximize=False)
     print('Brute force')
+    print('\tSolution:', mnl.dcs.Z)
+    print('\tD(Z):', mnl.disagreement())
+    print('\tRuntime:', time.time() - start)
+
+    start = time.time()
+    mnl_integer_program_agreement(mnl, maximize=False)
+    print('MIBLP')
     print('\tSolution:', mnl.dcs.Z)
     print('\tD(Z):', mnl.disagreement())
     print('\tRuntime:', time.time() - start)

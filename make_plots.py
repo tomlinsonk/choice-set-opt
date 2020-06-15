@@ -2,6 +2,7 @@ import os
 import pickle
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 from scipy.stats import gaussian_kde
 
@@ -121,6 +122,8 @@ def plot_all_pairs_agree():
 
     fig, axes = plt.subplots(2, 2, figsize=(5, 4.8), sharey='row')
 
+    ip_fig, ip_axes = plt.subplots(2, 1, figsize=(3.5, 4.8))
+
     for row, dataset in enumerate(('Allstate', 'YOOCHOOSE')):
         with open(f'results/{dataset.lower()}_all_pairs_agreement.pickle', 'rb') as f:
             data = pickle.load(f)
@@ -130,22 +133,41 @@ def plot_all_pairs_agree():
         for col, model in enumerate(('mnl', 'cdm')):
             agree_approx_Ds = []
             agree_greedy_Ds = []
+            agree_ip_Ds = []
             disagree_approx_Ds = []
             disagree_greedy_Ds = []
+            disagree_ip_Ds = []
             num_sets_computeds = []
-            for choice_set, greedy_min_D, approx_min_D, greedy_min_Z, approx_min_Z, greedy_max_D, approx_max_D, \
-                greedy_max_Z, approx_max_Z, num_sets_computed, total_sets in data[model, epsilons[model]]:
+            for choice_set, greedy_min_D, approx_min_D, ip_min_D, greedy_min_Z, approx_min_Z, ip_min_Z, greedy_max_D, approx_max_D, ip_max_D, greedy_max_Z, approx_max_Z, ip_max_Z, num_sets_computed, total_sets in data[model, epsilons[model]]:
                 agree_approx_Ds.append(approx_min_D)
                 agree_greedy_Ds.append(greedy_min_D)
+                agree_ip_Ds.append(ip_min_D)
                 disagree_approx_Ds.append(approx_max_D)
                 disagree_greedy_Ds.append(greedy_max_D)
+                disagree_ip_Ds.append(ip_max_D)
                 num_sets_computeds.append(num_sets_computed)
 
             agree_approx_Ds = np.array(agree_approx_Ds)
             agree_greedy_Ds = np.array(agree_greedy_Ds)
+            agree_ip_Ds = np.array(agree_ip_Ds)
             disagree_approx_Ds = np.array(disagree_approx_Ds)
             disagree_greedy_Ds = np.array(disagree_greedy_Ds)
+            disagree_ip_Ds = np.array(disagree_ip_Ds)
+
             pct_sets_computed = np.mean(num_sets_computeds) / total_sets * 100
+
+            if model == 'mnl':
+                ip_axes[row].boxplot([agree_approx_Ds - agree_ip_Ds, disagree_approx_Ds - disagree_ip_Ds],
+                                       showfliers=False, zorder=10, widths=0.3, boxprops={'linewidth': 2},
+                                       whiskerprops={'linewidth': 2}, medianprops={'linewidth': 2},
+                                       capprops={'linewidth': 2})
+                ip_axes[row].plot((1, 2), (
+                    np.mean(agree_approx_Ds - agree_ip_Ds), np.mean(disagree_approx_Ds - disagree_ip_Ds)), '.',
+                                    markerfacecolor='white', markersize=8, marker='X', zorder=100, markeredgewidth=1,
+                                    markeredgecolor='black')
+                ip_axes[row].scatter((0.75 + np.random.random(len(agree_approx_Ds)) / 2, 1.75 + np.random.random(len(agree_approx_Ds)) / 2),
+                                     [agree_approx_Ds - agree_ip_Ds, disagree_approx_Ds - disagree_ip_Ds],
+                                       color='darkblue', alpha=0.2, s=8, zorder=0, marker='o', linewidths=0)
 
             axes[row, col].boxplot([agree_approx_Ds - agree_greedy_Ds, disagree_approx_Ds - disagree_greedy_Ds],
                                    showfliers=False, zorder=10, widths=0.3, boxprops={'linewidth': 2},
@@ -184,6 +206,7 @@ def plot_all_pairs_agree():
             axes[row, col].tick_params(labelsize=9)
             if col == 0:
                 axes[row, col].set_ylabel('Alg. 1 $D(Z)$ - Greedy $D(Z)$')
+                ip_axes[row].set_ylabel(f'{dataset}\nAlg. 1 $D(Z)$ - MIBLP $D(Z)$')
             else:
                 axes[row, col].annotate(dataset, xy=(1, 0.5), xytext=(-axes[row, col].yaxis.labelpad + 20, 0),
                                         xycoords='axes fraction', textcoords='offset points',
@@ -195,16 +218,32 @@ def plot_all_pairs_agree():
                                         fontsize=14, ha='center', va='baseline')
                 axes[row, col].set_xticks([])
                 axes[row, col].set_xticklabels([])
+                ip_axes[row].set_xticks([])
+                ip_axes[row].set_xticklabels([])
             else:
                 axes[row, col].set_xticks([1, 2])
                 axes[row, col].set_xticklabels(['Agreement', 'Disagreement'])
+                ip_axes[row].set_xticks([1, 2])
+                ip_axes[row].set_xticklabels(['Agreement', 'Disagreement'])
 
             axes[row, col].axhline(0, 0, 3, color='black', linewidth=0.8)
             axes[row, col].set_yscale('symlog', linthreshy=0.0011)
+            ip_axes[row].set_yscale('symlog', linthreshy=0.0011)
 
+    plt.figure(fig.number)
     plt.tight_layout(h_pad=0, w_pad=0.3)
     plt.savefig('plots/all_pairs_agree.pdf', bbox_inches='tight')
     print('Saved plot to: plots/all_pairs_agree.pdf')
+    plt.close()
+
+    plt.figure(ip_fig.number)
+    ip_axes[0].set_yticks([-2e-8, -1e-8, 0, 1e-8])
+    ip_axes[1].set_yticks([0, 5e-5, 10e-5, 15e-5, 20e-5])
+    ip_axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
+    ip_axes[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+    plt.tight_layout(h_pad=0, w_pad=0.3)
+    plt.savefig('plots/ip_all_pairs_agree.pdf', bbox_inches='tight')
+    print('Saved plot to: plots/ip_all_pairs_agree.pdf')
     plt.close()
 
 
