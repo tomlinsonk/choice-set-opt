@@ -442,10 +442,6 @@ def cdm_approx_promotion(cdm, target, epsilon=0.01):
 
 if __name__ == '__main__':
     # Example usage
-    cdm = CDM.random_instance(2, 2, 41)
-    mnl = MNL.random_instance(2, 2, 41)
-
-    # Example usage
     dcs = DiscreteChoiceSetting(
         list(range(2)),
         list(range(4)),
