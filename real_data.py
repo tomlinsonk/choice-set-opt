@@ -604,16 +604,6 @@ def run_allstate_experiments(args):
 
     epsilons = {'mnl': 0.12, 'cdm': 80}
 
-    # Sampled choice sets agreement optimization
-    sampled_choice_set_results = dict()
-    for model in models:
-        print(f'Running Allstate sampled choice sets {model.short_name.upper()}')
-        sampled_choice_set_results[model.short_name, epsilons[model.short_name]] = sampled_choice_sets_agreement(
-            choice_sets, args.threads, model, epsilons[model.short_name])
-
-    with open('results/allstate_sampled_choice_sets_agreement.pickle', 'wb') as f:
-        pickle.dump(sampled_choice_set_results, f)
-
     # All pairs agreement optimization
     results = dict()
     for model in models:
@@ -643,6 +633,16 @@ def run_allstate_experiments(args):
 
     # All pairs promo, brute force
     allstate_all_pairs_promo(args.threads, cdm, unique_items, item_indices, epsilon=0, brute_force=True)
+
+    # Sampled choice sets agreement optimization
+    sampled_choice_set_results = dict()
+    for model in models:
+        print(f'Running Allstate sampled choice sets {model.short_name.upper()}')
+        sampled_choice_set_results[model.short_name, epsilons[model.short_name]] = sampled_choice_sets_agreement(
+            choice_sets, args.threads, model, epsilons[model.short_name])
+
+    with open('results/allstate_sampled_choice_sets_agreement.pickle', 'wb') as f:
+        pickle.dump(sampled_choice_set_results, f)
 
 
 def run_yoochoose_experiments(args):
