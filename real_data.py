@@ -572,7 +572,7 @@ def sampled_choice_sets_agreement(choice_sets, num_threads, model, epsilon):
 
     filtered_choice_sets = [x for x in choice_sets if 1 < np.count_nonzero(x) <= 5]
 
-    choice_set_indices = np.random.choice(range(len(filtered_choice_sets)), 250, replace=False)
+    choice_set_indices = np.random.choice(range(len(filtered_choice_sets)), 500, replace=False)
     sampled_choice_sets = [tuple(np.nonzero(filtered_choice_sets[i])[0]) for i in choice_set_indices]
 
     pool = Pool(num_threads)
@@ -635,6 +635,8 @@ def run_allstate_experiments(args):
     allstate_all_pairs_promo(args.threads, cdm, unique_items, item_indices, epsilon=0, brute_force=True)
 
     # Sampled choice sets agreement optimization
+    epsilons = {'mnl': 2, 'cdm': 500}
+
     sampled_choice_set_results = dict()
     for model in models:
         print(f'Running Allstate sampled choice sets {model.short_name.upper()}')
@@ -666,6 +668,7 @@ def run_yoochoose_experiments(args):
         pickle.dump(results, f)
 
     # Sampled choice sets agreement optimization
+    epsilons = {'mnl': 2, 'cdm': 500}
     choice_sets, _, _, _ = load_yoochoose()
     sampled_choice_set_results = dict()
     for model in models:
