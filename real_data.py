@@ -570,7 +570,7 @@ def sampled_choice_sets_agreement(choice_sets, num_threads, model, epsilon):
     :param epsilon: approximation parameter
     """
 
-    filtered_choice_sets = [x for x in choice_sets if 1 < np.count_nonzero(x) <= 5]
+    filtered_choice_sets = [x for x in choice_sets if 1 < np.count_nonzero(x)]
 
     choice_set_indices = np.random.choice(range(len(filtered_choice_sets)), 500, replace=False)
     sampled_choice_sets = [tuple(np.nonzero(filtered_choice_sets[i])[0]) for i in choice_set_indices]

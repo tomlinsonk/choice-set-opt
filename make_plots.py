@@ -70,7 +70,7 @@ def plot_allstate():
 
     attempts = np.count_nonzero(sets_computed, axis=1)[0]
 
-    plt.figure(figsize=(3, 2.2))
+    plt.figure(figsize=(2.6, 1.7))
 
     # Good boxplot widths (https://stackoverflow.com/questions/46687062/matplotlib-boxplot-width-in-log-scale)
     w = 0.2
@@ -93,17 +93,17 @@ def plot_allstate():
 
     plt.close()
 
-    plt.figure(figsize=(3, 2.2))
+    plt.figure(figsize=(2.6, 1.7))
 
-    plt.plot(epsilons, np.array(approx_num_solved) / attempts, '.-', label='Algorithm 1')
-    plt.plot(epsilons, np.array(greedy_num_solved) / attempts, label='Greedy', ls='dotted')
-    plt.hlines(opt_num_solved / attempts, 0.05, 1500, label='Brute force', ls='dashed')
+    plt.plot(epsilons, np.array(approx_num_solved) / attempts, '.', label='Algorithm 1', markersize=10)
+    plt.plot([0.05, 1500], np.array(greedy_num_solved)[:2] / attempts, label='Greedy', ls='dashed', linewidth=2)
+    plt.hlines(opt_num_solved / attempts, 0.05, 1500, label='Brute force', linewidth=2)
 
     plt.xscale('log')
     plt.ylim(0, 1)
     plt.xlim(0.1, 1400)
     plt.xlabel('Approximation $\\varepsilon$', fontsize=12)
-    plt.ylabel('Frac. Instances Solved', fontsize=12)
+    plt.ylabel('Proportion Solved', fontsize=12)
     plt.xticks([10 ** i for i in range(-1, 4)], ['$10^{{{}}}$'.format(i) for i in range(-1, 4)])
     plt.tick_params(labelsize=12)
     plt.legend(loc='lower left')
@@ -113,7 +113,7 @@ def plot_allstate():
     plt.close()
 
 
-def plot_all_pairs_agree():
+def plot_agree(exp_name):
     np.random.seed(0)
     label_coords = {'Allstate': {'mnl': (0.03, 0.83), 'cdm': (0.03, 0.83)},
                     'YOOCHOOSE': {'mnl': (0.03, 0.83), 'cdm': (0.03, 0.83)}}
@@ -125,7 +125,7 @@ def plot_all_pairs_agree():
     ip_fig, ip_axes = plt.subplots(2, 1, figsize=(3.5, 4.8))
 
     for row, dataset in enumerate(('Allstate', 'YOOCHOOSE')):
-        with open(f'results/{dataset.lower()}_all_pairs_agreement.pickle', 'rb') as f:
+        with open(f'results/{dataset.lower()}_{exp_name}_agreement.pickle', 'rb') as f:
             data = pickle.load(f)
 
         epsilons = {model_name: epsilon for model_name, epsilon in data.keys()}
@@ -138,7 +138,8 @@ def plot_all_pairs_agree():
             disagree_greedy_Ds = []
             disagree_ip_Ds = []
             num_sets_computeds = []
-            for choice_set, greedy_min_D, approx_min_D, ip_min_D, greedy_min_Z, approx_min_Z, ip_min_Z, greedy_max_D, approx_max_D, ip_max_D, greedy_max_Z, approx_max_Z, ip_max_Z, num_sets_computed, total_sets in data[model, epsilons[model]]:
+            for choice_set, greedy_min_D, approx_min_D, ip_min_D, greedy_min_Z, approx_min_Z, ip_min_Z, greedy_max_D, approx_max_D, ip_max_D, greedy_max_Z, approx_max_Z, ip_max_Z, num_sets_computed, total_sets in \
+            data[model, epsilons[model]]:
                 agree_approx_Ds.append(approx_min_D)
                 agree_greedy_Ds.append(greedy_min_D)
                 agree_ip_Ds.append(ip_min_D)
@@ -158,16 +159,17 @@ def plot_all_pairs_agree():
 
             if model == 'mnl':
                 ip_axes[row].boxplot([agree_approx_Ds - agree_ip_Ds, disagree_approx_Ds - disagree_ip_Ds],
-                                       showfliers=False, zorder=10, widths=0.3, boxprops={'linewidth': 2},
-                                       whiskerprops={'linewidth': 2}, medianprops={'linewidth': 2},
-                                       capprops={'linewidth': 2})
+                                     showfliers=False, zorder=10, widths=0.3, boxprops={'linewidth': 2},
+                                     whiskerprops={'linewidth': 2}, medianprops={'linewidth': 2},
+                                     capprops={'linewidth': 2})
                 ip_axes[row].plot((1, 2), (
                     np.mean(agree_approx_Ds - agree_ip_Ds), np.mean(disagree_approx_Ds - disagree_ip_Ds)), '.',
-                                    markerfacecolor='white', markersize=8, marker='X', zorder=100, markeredgewidth=1,
-                                    markeredgecolor='black')
-                ip_axes[row].scatter((0.75 + np.random.random(len(agree_approx_Ds)) / 2, 1.75 + np.random.random(len(agree_approx_Ds)) / 2),
+                                  markerfacecolor='white', markersize=8, marker='X', zorder=100, markeredgewidth=1,
+                                  markeredgecolor='black')
+                ip_axes[row].scatter((0.75 + np.random.random(len(agree_approx_Ds)) / 2,
+                                      1.75 + np.random.random(len(agree_approx_Ds)) / 2),
                                      [agree_approx_Ds - agree_ip_Ds, disagree_approx_Ds - disagree_ip_Ds],
-                                       color='darkblue', alpha=0.2, s=8, zorder=0, marker='o', linewidths=0)
+                                     color='darkblue', alpha=0.2, s=8, zorder=0, marker='o', linewidths=0)
 
             axes[row, col].boxplot([agree_approx_Ds - agree_greedy_Ds, disagree_approx_Ds - disagree_greedy_Ds],
                                    showfliers=False, zorder=10, widths=0.3, boxprops={'linewidth': 2},
@@ -198,7 +200,7 @@ def plot_all_pairs_agree():
 
             axes[row, col].scatter((agree_xvals, disagree_xvals), (agree_data, disagree_data),
                                    color='darkblue', alpha=0.2, s=8, zorder=0, marker='o', linewidths=0)
-            pct_sets_string = f'{pct_sets_computed:.6f}% sets' if dataset == 'YOOCHOOSE' else f'{pct_sets_computed:.0f}% sets'
+            pct_sets_string = f'{pct_sets_computed:.6f}% sets' if dataset == 'YOOCHOOSE' else (f'{pct_sets_computed:.0f}% sets' if exp_name == 'all_pairs' else f'{pct_sets_computed:.1f}% sets')
             axes[row, col].annotate(f'$\\varepsilon={epsilons[model]}$\n{pct_sets_string}',
                                     xy=label_coords[dataset][model], xycoords='axes fraction', fontsize=10,
                                     ha=label_align[dataset][model])
@@ -232,8 +234,8 @@ def plot_all_pairs_agree():
 
     plt.figure(fig.number)
     plt.tight_layout(h_pad=0, w_pad=0.3)
-    plt.savefig('plots/all_pairs_agree.pdf', bbox_inches='tight')
-    print('Saved plot to: plots/all_pairs_agree.pdf')
+    plt.savefig(f'plots/{exp_name}_agree.pdf', bbox_inches='tight')
+    print(f'Saved plot to: plots/{exp_name}_agree.pdf')
     plt.close()
 
     plt.figure(ip_fig.number)
@@ -242,13 +244,22 @@ def plot_all_pairs_agree():
     ip_axes[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
     ip_axes[1].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
     plt.tight_layout(h_pad=0, w_pad=0.3)
-    plt.savefig('plots/ip_all_pairs_agree.pdf', bbox_inches='tight')
-    print('Saved plot to: plots/ip_all_pairs_agree.pdf')
+    plt.savefig(f'plots/ip_{exp_name}_agree.pdf', bbox_inches='tight')
+    print(f'Saved plot to: plots/ip_{exp_name}_agree.pdf')
     plt.close()
+
+
+def plot_all_pairs_agree():
+    plot_agree('all_pairs')
+
+
+def plot_sampled_choice_sets_agree():
+    plot_agree('sampled_choice_sets')
 
 
 if __name__ == '__main__':
     os.makedirs('plots', exist_ok=True)
     plot_all_pairs_agree()
+    plot_sampled_choice_sets_agree()
     plot_allstate()
     plot_proof_functions()
