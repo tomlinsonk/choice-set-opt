@@ -561,6 +561,33 @@ def all_pairs_agreement(num_threads, model, epsilon):
     return results
 
 
+def sampled_choice_sets_agreement(choice_sets, num_threads, model, epsilon):
+    """
+    Optimize agreement for 500 randomly sampled choice sets.
+    :param choice_sets: the choice sets to sample from
+    :param num_threads: number of threads to use
+    :param model: a fitted DiscreteChoiceModel with two agents
+    :param epsilon: approximation parameter
+    """
+
+    filtered_choice_sets = [x for x in choice_sets if 1 < np.count_nonzero(x) <= 5]
+
+    choice_set_indices = np.random.choice(range(len(filtered_choice_sets)), 500, replace=False)
+    sampled_choice_sets = [tuple(np.nonzero(filtered_choice_sets[i])[0]) for i in choice_set_indices]
+
+    pool = Pool(num_threads)
+    helper_partial = partial(agreement_helper, model=model, epsilon=epsilon)
+    results = []
+
+    for result in tqdm(pool.imap_unordered(helper_partial, sampled_choice_sets), total=len(sampled_choice_sets)):
+        results.append(result)
+
+    pool.close()
+    pool.join()
+
+    return results
+
+
 def run_allstate_experiments(args):
     """
     Run experiments on Allstate dataset in parallel
@@ -570,13 +597,14 @@ def run_allstate_experiments(args):
 
     cdm, allstate_load_fn, data, unique_items, item_indices, choice_sets, choices, costs, item_counts = load_allstate()
 
-    # All pairs agreement optimization
     if args.saved_models:
         models = load_two_agent_models('allstate')
     else:
         models = infer_two_agent_models(allstate_load_fn, 'allstate')
 
     epsilons = {'mnl': 0.12, 'cdm': 80}
+
+    # All pairs agreement optimization
     results = dict()
     for model in models:
         print(f'Running Allstate all pairs {model.short_name.upper()}')
@@ -606,6 +634,18 @@ def run_allstate_experiments(args):
     # All pairs promo, brute force
     allstate_all_pairs_promo(args.threads, cdm, unique_items, item_indices, epsilon=0, brute_force=True)
 
+    # Sampled choice sets agreement optimization
+    epsilons = {'mnl': 2, 'cdm': 500}
+
+    sampled_choice_set_results = dict()
+    for model in models:
+        print(f'Running Allstate sampled choice sets {model.short_name.upper()}')
+        sampled_choice_set_results[model.short_name, epsilons[model.short_name]] = sampled_choice_sets_agreement(
+            choice_sets, args.threads, model, epsilons[model.short_name])
+
+    with open('results/allstate_sampled_choice_sets_agreement.pickle', 'wb') as f:
+        pickle.dump(sampled_choice_set_results, f)
+
 
 def run_yoochoose_experiments(args):
     """
@@ -626,6 +666,18 @@ def run_yoochoose_experiments(args):
 
     with open('results/yoochoose_all_pairs_agreement.pickle', 'wb') as f:
         pickle.dump(results, f)
+
+    # Sampled choice sets agreement optimization
+    epsilons = {'mnl': 2, 'cdm': 500}
+    choice_sets, _, _, _ = load_yoochoose()
+    sampled_choice_set_results = dict()
+    for model in models:
+        print(f'Running Yoochoose sampled choice sets {model.short_name.upper()}')
+        sampled_choice_set_results[model.short_name, epsilons[model.short_name]] = sampled_choice_sets_agreement(
+            choice_sets, args.threads, model, epsilons[model.short_name])
+
+    with open('results/yoochoose_sampled_choice_sets_agreement.pickle', 'wb') as f:
+        pickle.dump(sampled_choice_set_results, f)
 
 
 if __name__ == '__main__':

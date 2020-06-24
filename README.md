@@ -72,10 +72,26 @@ Intel Core i7-6700T CPU running Ubuntu 18.04.3 LTS). Since PyTorch uses numerica
 different models will inferred on different computer architectures or PyTorch/Python versions; however, this should have
 no effect on the trends we observe.
 
-If you don't have access to a Gurobi license (free for academic use), you can check out commit b03f43e3c33abab96522d010b7f706f88babb234
-to run the old version of the code, which has everything except the MIBLP code.
-
 Running ``python3 optimize_choice_sets.py`` will show details about the bad instance of Agreement for Greedy from the appendix.
+
+##### A few notes about running with Gurobi
+
+If you don't have access to a Gurobi license (free for academic use), you can check out commit b03f43e3c33abab96522d010b7f706f88babb234
+to run the old version of the code, which has everything except the MIBLP code and the sampled choice set experiment.
+
+On MacOS Catalina, running Gurobi with multithreading gave me the following error:
+```bash
++[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
+```
+
+
+To fix it, I added the environment variable
+```bash
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+```
+as suggested by [this StackOverflow question](https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr).
+
+
 
 
 
