@@ -77,7 +77,7 @@ Running ``python3 optimize_choice_sets.py`` will show details about the bad inst
 ##### A few notes about running with Gurobi
 
 If you don't have access to a Gurobi license (free for academic use), you can check out commit b03f43e3c33abab96522d010b7f706f88babb234
-to run the old version of the code, which has everything except the MIBLP code.
+to run the old version of the code, which has everything except the MIBLP code and the sampled choice set experiment.
 
 On MacOS Catalina, running Gurobi with multithreading gave me the following error:
 ```bash
