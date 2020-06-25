@@ -407,7 +407,7 @@ def cdm_approx_promotion(cdm, target, epsilon=0.01):
     shifted_u_p = (cdm.u_p - np.min(cdm.u_p) + 1)
     shifted_u_p[:, np.arange(n), np.arange(n)] = 0
 
-    delta = epsilon / (20 * m)
+    delta = epsilon / (10 * m)
     base_change = np.log(1 + delta)
 
     # each entry of L stores Z and sum_{z in C\cup Z} q_a{z, x} for each a in A and item x in C (numerator of Pr)
