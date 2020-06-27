@@ -67,7 +67,7 @@ python3 real_data.py --threads [NUM THREADS]
 python3 make_plots.py
 ```
 Running ``real_data.py`` produces the Allstate and YOOCHOOSE results files, saves tables showing optimal sets for 
-SFWork, and prints out the SFWork summary statistics. In total, the experiments take about half a day to run (on my 
+SFWork, and prints out the SFWork summary statistics. In total, the experiments take about a day to run (on my 
 Intel Core i7-6700T CPU running Ubuntu 18.04.3 LTS). Since PyTorch uses numerical methods, it is possible that slightly
 different models will inferred on different computer architectures or PyTorch/Python versions; however, this should have
 no effect on the trends we observe.
